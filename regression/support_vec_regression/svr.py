@@ -7,3 +7,6 @@ class SVR:
 
     def fit(self, x):
         pass
+
+    def predict(self, x):
+        pass
