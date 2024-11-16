@@ -4,6 +4,17 @@ class LinearRegression:
         self.fit_intercept=fit_intercept
         self.theta=None
 
+#Locally_Weighted_Regression
+class LocallyWeightedRegression:
+    def __init__(self,t):
+        self.t=t
+        self.parameters=None
+    
+    def fit(self,x_train,y_train):
+        pass
+    def predict(self,x_test):
+        pass
+
 
 class LogisticRegression:
     def __init__(self,fit_intercept=False):
@@ -20,7 +31,7 @@ class LogisticRegression:
             likelihood_old='inf'
         while(True):
             hypothesis=1/(1+np.exp(-np.dot(x_train,self.parameters)))
-            likelihood=np.dot((y_train-hypothesis).T,x_train).T
+            likelihood=np.dot(x_train.T,(y_train-hypothesis))
             self.parameters=self.parameters+self.learn_rate*likelihood
             if likelihood_old>likelihood:
                 break
