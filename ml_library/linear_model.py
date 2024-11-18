@@ -21,16 +21,23 @@ class LocallyWeightedRegression:
         self.t=t
         self.fit_intercept=fit_intercept
         self.parameters=None
+        self.weights=None
     #defining the fit method
     def fit(self,x_train,y_train):
         #making sure the inputs are of array type
         x_train,y_train=__change_type(x_train,y_train)
         #initializing the parameters
-        self.parameters
+        self.parameters=__init_parameters(x_train)
         #adding intercept term if specified by user
         if self.fit_intercept:
             x_train=__fit_intercept(x_train)
-        
+        #designing the algorithm using normal equations
+        self.weights=np.ones((1,x_train.shape[0]))
+        for i in x_train:
+            temp=np.exp(-(np.linalg.norm(x_train.T-i.reshape(1,len(i)).T)**2)/2*(self.t**2))
+            self.weights=np.vstack(self.weights,temp)
+        self.weights=self.weights[1:,:]
+        self.parameters=np.dot(np.linalg.inv(np.dot(x_train.T,np.dot(self.weights,x_train))),np.dot(x_train.T,np.dot(self.weights,y_train)))
     #defining the predict method
     def predict(self,x_test):
         pass
@@ -47,7 +54,7 @@ class LogisticRegression:
         #making sure inputs are in array type
         x_train,y_train=__change_type(x_train,y_train)
         #initializing parameters
-        self.parameters=np.zeros((x_train.shape[1],1))
+        self.parameters=__init_parameters(x_train)
         #adding intercept term if specified by user
         if self.fit_intercept:
             x_train=__fit_intercept(x_train)
@@ -72,3 +79,4 @@ class LogisticRegression:
     @property
     def intercept_(self):
         return self.parameters[0]
+# %%
