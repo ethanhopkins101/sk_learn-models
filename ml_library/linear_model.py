@@ -1,6 +1,10 @@
 import numpy as np
 #function that changes the learning algorithm inputs to array-like
-def __change_type(x_train,y_train):
+def __change_type(x,y=None):
+    if y is None:
+        return np.array(x)
+    else:
+        return np.array(x),np.array(y)
     return (np.array(x_train),np.array(y_train))#returning a tuple
 #designing intercept_fitting function:
 def __fit_intercept(x_train):
@@ -9,10 +13,26 @@ def __fit_intercept(x_train):
 #arbitrary parameter initializer function:
 def __init_parameters(x_train):
     return np.zeros((x_train.shape[1],1))#return a column vector of shape x_train[1]
+
+#Linear_Regression
 class LinearRegression:
+    #Class initializer
     def __init__(self,fit_intercept=False):
         self.fit_intercept=fit_intercept
-        self.theta=None
+        self.parameters=None #initializing parameters
+    #defining the fit method
+    def fit(self,x_train,y_train):
+        x_train,y_train=__change_type(x_train,y_train) #changing the inputs type to arrays
+        self.parameters=__init_parameters(x_train) # setting parameters to vector of zeros
+        #adding intercept term if specified by user
+        if self.fit_intercept:
+            x_train=__fit_intercept(x_train)
+        #Designing the learning algorithm (normal equations: o=(x.T*x).inv*x.T*y)
+        self.parameters=np.dot(np.linalg.inv(np.dot(x_train.T,x_train)),np.dot(x_train.T,y_train))
+    #defining the predict method
+    def predict(self,x_test):
+        x_test=__change_type(x_test)
+        return np.dot(x_test,)
 
 #Locally_Weighted_Regression
 class LocallyWeightedRegression:
