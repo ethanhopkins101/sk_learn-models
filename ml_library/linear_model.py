@@ -31,8 +31,20 @@ class LinearRegression:
         self.parameters=np.dot(np.linalg.inv(np.dot(x_train.T,x_train)),np.dot(x_train.T,y_train))
     #defining the predict method
     def predict(self,x_test):
-        x_test=__change_type(x_test)
-        return np.dot(x_test,)
+        if self.parameters is None :
+            raise NotImplementedError('model parameters are not initialized !')
+        else :
+            if self.fit_intercept:
+                x_test=__fit_intercept(x_test) # adding intercept term to x_test
+            x_test=__change_type(x_test) #making sure x_test is of array type
+            return np.dot(x_test,self.parameters) # return m by 1 column vector of predictions
+    @property
+    def coef_(self):
+        return self.parameters[1:] # returns the 'coef' except for the intercept
+    @property
+    def intercept_(self):
+        return self.parameters[0] # returns the 'intercept'
+
 
 #Locally_Weighted_Regression
 class LocallyWeightedRegression:
@@ -99,4 +111,4 @@ class LogisticRegression:
     @property
     def intercept_(self):
         return self.parameters[0]
-# %%
+        
