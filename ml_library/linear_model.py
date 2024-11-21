@@ -102,7 +102,7 @@ class LogisticRegression:
                 break
             likelihood_old=likelihood
     #defining predict method
-    def predict():
+    def predict(self):
         pass
 
     @property
