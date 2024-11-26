@@ -23,7 +23,6 @@ class LinearRegression:
     #defining the fit method
     def fit(self,x_train,y_train):
         x_train,y_train=__change_type(x_train,y_train) #changing the inputs type to arrays
-        self.parameters=__init_parameters(x_train) # setting parameters to vector of zeros
         #adding intercept term if specified by user
         if self.fit_intercept:
             x_train=__fit_intercept(x_train)
@@ -52,27 +51,18 @@ class LocallyWeightedRegression:
     def __init__(self,t,fit_intercept=False):
         self.t=t
         self.fit_intercept=fit_intercept
-        self.parameters=None
-        self.weights=None
+        self.x_train=None
+        self.y_train=None
     #defining the fit method
-    def fit(self,x_train,y_train):
+    def fit_predict(self,x_train,y_train,x_test):
         #making sure the inputs are of array type
         x_train,y_train=__change_type(x_train,y_train)
-        #initializing the parameters
-        self.parameters=__init_parameters(x_train)
         #adding intercept term if specified by user
         if self.fit_intercept:
             x_train=__fit_intercept(x_train)
-        #designing the algorithm using normal equations
-        self.weights=np.ones((1,x_train.shape[0]))
-        for i in x_train:
-            temp=np.exp(-(np.linalg.norm(x_train.T-i.reshape(1,len(i)).T)**2)/2*(self.t**2))
-            self.weights=np.vstack(self.weights,temp)
-        self.weights=self.weights[1:,:]
-        self.parameters=np.dot(np.linalg.inv(np.dot(x_train.T,np.dot(self.weights,x_train))),np.dot(x_train.T,np.dot(self.weights,y_train)))
-    #defining the predict method
-    def predict(self,x_test):
-        pass
+        self.x_train,self.y_train=x_train,y_train
+         #defining the predict method
+
 
 
 class LogisticRegression:
@@ -85,11 +75,11 @@ class LogisticRegression:
     def fit(self,x_train,y_train):
         #making sure inputs are in array type
         x_train,y_train=__change_type(x_train,y_train)
-        #initializing parameters
-        self.parameters=__init_parameters(x_train)
         #adding intercept term if specified by user
         if self.fit_intercept:
             x_train=__fit_intercept(x_train)
+        #initializing parameters
+        self.parameters=__init_parameters(x_train)
         likelihood_old='inf'
         #training the model
         while(True):
