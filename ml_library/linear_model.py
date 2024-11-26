@@ -62,7 +62,27 @@ class LocallyWeightedRegression:
             x_train=__fit_intercept(x_train)
         self.x_train,self.y_train=x_train,y_train
          #defining the predict method
-
+    def predict(self,x_test):
+        #Checking if user provided training-sets already
+        if self.x_train is None:
+            raise NotImplementedError('Training data was not provided !')
+        x_test=__change_type(x_test)
+        #Adding intercept term if specified by the user
+        if self.fit_intercept :
+            x_test=__fit_intercept(x_test)
+        t_square=np.square(self.t)
+        predictions=[] # empty prediction list
+        #designing the algorithm using normal equations
+        for i in range(x_test.shape[0]): #Looping through the prediction points 
+            weights=[]
+            for j in range(self.x_train.shape[0]): #Looping through our training points to formulate the weights
+                distance=np.sum(np.square((self.x_train[j,:]-x_test[i,:])))
+                weight=np.exp(distance/(2*t_square))
+                weights.append(weight)
+            weights=np.multiply(weights,np.identity(len(weights))) # Weight matrix (mxm)
+            parameters=np.dot(np.linalg.inv(np.dot(self.x_train.T,np.dot(weights,self.x_train))),np.dot(self.x_train.T,np.dot(weights,self.y_train)))
+            predictions.append(np.dot(x_test[i,:],parameters))
+        return np.array(predictions)
 
 
 class LogisticRegression:
