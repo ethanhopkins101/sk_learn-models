@@ -54,7 +54,7 @@ class LocallyWeightedRegression:
         self.x_train=None
         self.y_train=None
     #defining the fit method
-    def fit_predict(self,x_train,y_train,x_test):
+    def fit(self,x_train,y_train,x_test):
         #making sure the inputs are of array type
         x_train,y_train=__change_type(x_train,y_train)
         #adding intercept term if specified by user
