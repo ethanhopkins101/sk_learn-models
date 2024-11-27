@@ -121,4 +121,7 @@ class LogisticRegression:
     @property
     def intercept_(self):
         return self.parameters[0]
+    
+class PoissonRegression:
+    pass
         
