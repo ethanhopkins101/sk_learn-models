@@ -123,5 +123,21 @@ class LogisticRegression:
         return self.parameters[0]
     
 class PoissonRegression:
-    pass
+    #Class initializer
+    def __init__(self,fit_intercept=False,learning_rate=0.005):
+        self.learning_rate=learning_rate
+        self.parameters=None
+        self.fit_intercept=fit_intercept #Intercept vector check
+    # Defining the fit method
+    def fit(self,x_train,y_train):
+        x_train,y_train=__change_type(x_train,y_train)
+        if __fit_intercept:
+            x_train=__fit_intercept(x_train)
+        self.parameters=__init_parameters(x_train) # initializing parameters to vector of zeros
+        # defining the likelihood ascent :
+        exit_point=np.power(10.0,-5) #defining exit_point for the loop
+        while(gradient>exit_point):
+            hypothesis=np.exp(np.dot(x_train,self.parameters)) # our poisson hypothesis
+            gradient=np.dot(x_train.T,y_train-hypothesis)
+            self.parameters+=self.learning_rate*gradient #gradient ascent
         
