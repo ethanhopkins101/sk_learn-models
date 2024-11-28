@@ -5,7 +5,6 @@ def __change_type(x,y=None):
         return np.array(x)
     else:
         return np.array(x),np.array(y)
-    return (np.array(x_train),np.array(y_train))#returning a tuple
 #designing intercept_fitting function:
 def __fit_intercept(x_train):
     intercept=np.ones((x_train.shape[0],1)) #column vector of ones
@@ -31,12 +30,13 @@ class LinearRegression:
     #defining the predict method
     def predict(self,x_test):
         if self.parameters is None :
-            raise NotImplementedError('model parameters are not initialized !')
-        else :
-            if self.fit_intercept:
-                x_test=__fit_intercept(x_test) # adding intercept term to x_test
-            x_test=__change_type(x_test) #making sure x_test is of array type
-            return np.dot(x_test,self.parameters) # return m by 1 column vector of predictions
+            raise ValueError('Fit method was not called'
+                             'Training data was not provided !')
+
+        x_test=__change_type(x_test) #making sure x_test is of array type 
+        if self.fit_intercept:
+            x_test=__fit_intercept(x_test) # adding intercept term to x_test
+        return np.dot(x_test,self.parameters) # return m by 1 column vector of predictions
     @property
     def coef_(self):
         return self.parameters[1:] # returns the 'coef' except for the intercept
@@ -55,6 +55,9 @@ class LocallyWeightedRegression:
         self.y_train=None
     #defining the fit method
     def fit(self,x_train,y_train,x_test):
+        if (x_train.shape[0]!=y_train.shape[0]):
+            raise ValueError('x_train shape does not match y_train'
+                             f'{x_train.shape[0]} and {y_train.shape[0]}')
         #making sure the inputs are of array type
         x_train,y_train=__change_type(x_train,y_train)
         #adding intercept term if specified by user
@@ -65,7 +68,8 @@ class LocallyWeightedRegression:
     def predict(self,x_test):
         #Checking if user provided training-sets already
         if self.x_train is None:
-            raise NotImplementedError('Training data was not provided !')
+            raise ValueError('Fit method was not called'
+                'Training data was not provided !')
         x_test=__change_type(x_test)
         #Adding intercept term if specified by the user
         if self.fit_intercept :
@@ -93,6 +97,9 @@ class LogisticRegression:
         self.learn_rate=0.05
     # defining the fit method
     def fit(self,x_train,y_train):
+        if (x_train.shape[0]!=y_train.shape[0]):
+            raise ValueError('x_train shape does not match y_train'
+                             f'{x_train.shape[0]} and {y_train.shape[0]}')
         #making sure inputs are in array type
         x_train,y_train=__change_type(x_train,y_train)
         #adding intercept term if specified by user
@@ -123,21 +130,53 @@ class LogisticRegression:
         return self.parameters[0]
     
 class PoissonRegression:
+    
+    """
+    PoissonRegression using gradient ascent to maximize the log-likelihood function
+
+    Parameters:
+        fit_intercept (bool) : wether to include intercept
+        learning_rate (float) : step-size in the gradient ascent
+
+    Methods:
+        fit(x_train,y_train): training the parameters on the given data-set
+        predict(x_test): predicting outputs for given inputs
+    
+    """
+
     #Class initializer
-    def __init__(self,fit_intercept=False,learning_rate=0.005):
+    def __init__(self,fit_intercept=False,learning_rate=0.005,exit_point=np.power(10.0,-5)):
         self.learning_rate=learning_rate
         self.parameters=None
         self.fit_intercept=fit_intercept #Intercept vector check
+        self.exit_point=exit_point
+
     # Defining the fit method
     def fit(self,x_train,y_train):
         x_train,y_train=__change_type(x_train,y_train)
-        if __fit_intercept:
+        if (x_train.shape[0]!=y_train.shape[0]):
+            raise ValueError('x_train shape does not match y_train'
+                             f'{x_train.shape[0]} and {y_train.shape[0]}')
+        if self.fit_intercept:
             x_train=__fit_intercept(x_train)
         self.parameters=__init_parameters(x_train) # initializing parameters to vector of zeros
+
         # defining the likelihood ascent :
-        exit_point=np.power(10.0,-5) #defining exit_point for the loop
-        while(gradient>exit_point):
+        self.exit_point=np.power(10.0,-5) #defining exit_point for the loop
+        gradient=np.inf
+
+        while(gradient>self.exit_point):
             hypothesis=np.exp(np.dot(x_train,self.parameters)) # our poisson hypothesis
             gradient=np.dot(x_train.T,y_train-hypothesis)
             self.parameters+=self.learning_rate*gradient #gradient ascent
+
+    # Defining the predict method
+    def predict(self,x_test):
+        if self.parameters is None:
+            raise ValueError('Fit method was not called '
+                             'Training data was not provided !')
         
+        x_test=__change_type(x_test)
+        if self.fit_intercept:
+            x_test=__fit_intercept(x_test)
+        return np.dot(x_test,self.parameters)
