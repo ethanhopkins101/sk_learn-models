@@ -1,14 +1,17 @@
 import numpy as np
+
 #function that changes the learning algorithm inputs to array-like
 def __change_type(x,y=None):
     if y is None:
         return np.array(x)
     else:
         return np.array(x),np.array(y)
+    
 #designing intercept_fitting function:
 def __fit_intercept(x_train):
     intercept=np.ones((x_train.shape[0],1)) #column vector of ones
     return np.hstack((intercept,x_train)) #returning the appended vector with x_train
+
 #arbitrary parameter initializer function:
 def __init_parameters(x_train):
     return np.zeros((x_train.shape[1],1))#return a column vector of shape x_train[1]
@@ -19,6 +22,7 @@ class LinearRegression:
     def __init__(self,fit_intercept=False):
         self.fit_intercept=fit_intercept
         self.parameters=None #initializing parameters
+
     #defining the fit method
     def fit(self,x_train,y_train):
         x_train,y_train=__change_type(x_train,y_train) #changing the inputs type to arrays
@@ -27,6 +31,7 @@ class LinearRegression:
             x_train=__fit_intercept(x_train)
         #Designing the learning algorithm (normal equations: o=(x.T*x).inv*x.T*y)
         self.parameters=np.dot(np.linalg.inv(np.dot(x_train.T,x_train)),np.dot(x_train.T,y_train))
+    
     #defining the predict method
     def predict(self,x_test):
         if self.parameters is None :
@@ -60,11 +65,13 @@ class LocallyWeightedRegression:
                              f'{x_train.shape[0]} and {y_train.shape[0]}')
         #making sure the inputs are of array type
         x_train,y_train=__change_type(x_train,y_train)
+
         #adding intercept term if specified by user
         if self.fit_intercept:
             x_train=__fit_intercept(x_train)
         self.x_train,self.y_train=x_train,y_train
          #defining the predict method
+
     def predict(self,x_test):
         #Checking if user provided training-sets already
         if self.x_train is None:
@@ -74,8 +81,10 @@ class LocallyWeightedRegression:
         #Adding intercept term if specified by the user
         if self.fit_intercept :
             x_test=__fit_intercept(x_test)
+
         t_square=np.square(self.t)
         predictions=[] # empty prediction list
+
         #designing the algorithm using normal equations
         for i in range(x_test.shape[0]): #Looping through the prediction points 
             weights=[]
