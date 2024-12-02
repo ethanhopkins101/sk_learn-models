@@ -1,21 +1,5 @@
 import numpy as np
-
-#function that changes the learning algorithm inputs to array-like
-def __change_type(x,y=None):
-    if y is None:
-        return np.array(x)
-    else:
-        return np.array(x),np.array(y)
-    
-#designing intercept_fitting function:
-def __fit_intercept(x_train):
-    intercept=np.ones((x_train.shape[0],1)) #column vector of ones
-    return np.hstack((intercept,x_train)) #returning the appended vector with x_train
-
-#arbitrary parameter initializer function:
-def __init_parameters(x_train):
-    return np.zeros((x_train.shape[1],1))#return a column vector of shape x_train[1]
-
+from matrix_operations import *
 #Linear_Regression
 class LinearRegression:
     #Class initializer
@@ -25,10 +9,10 @@ class LinearRegression:
 
     #defining the fit method
     def fit(self,x_train,y_train):
-        x_train,y_train=__change_type(x_train,y_train) #changing the inputs type to arrays
+        x_train,y_train=change_type(x_train,y_train) #changing the inputs type to arrays
         #adding intercept term if specified by user
         if self.fit_intercept:
-            x_train=__fit_intercept(x_train)
+            x_train=fit_intercept(x_train)
         #Designing the learning algorithm (normal equations: o=(x.T*x).inv*x.T*y)
         self.parameters=np.dot(np.linalg.inv(np.dot(x_train.T,x_train)),np.dot(x_train.T,y_train))
     
@@ -38,9 +22,9 @@ class LinearRegression:
             raise ValueError('Fit method was not called'
                              'Training data was not provided !')
 
-        x_test=__change_type(x_test) #making sure x_test is of array type 
+        x_test=change_type(x_test) #making sure x_test is of array type 
         if self.fit_intercept:
-            x_test=__fit_intercept(x_test) # adding intercept term to x_test
+            x_test=fit_intercept(x_test) # adding intercept term to x_test
         return np.dot(x_test,self.parameters) # return m by 1 column vector of predictions
     @property
     def coef_(self):
@@ -64,11 +48,11 @@ class LocallyWeightedRegression:
             raise ValueError('x_train shape does not match y_train'
                              f'{x_train.shape[0]} and {y_train.shape[0]}')
         #making sure the inputs are of array type
-        x_train,y_train=__change_type(x_train,y_train)
+        x_train,y_train=change_type(x_train,y_train)
 
         #adding intercept term if specified by user
         if self.fit_intercept:
-            x_train=__fit_intercept(x_train)
+            x_train=fit_intercept(x_train)
         self.x_train,self.y_train=x_train,y_train
          #defining the predict method
 
@@ -77,10 +61,10 @@ class LocallyWeightedRegression:
         if self.x_train is None:
             raise ValueError('Fit method was not called'
                 'Training data was not provided !')
-        x_test=__change_type(x_test)
+        x_test=change_type(x_test)
         #Adding intercept term if specified by the user
         if self.fit_intercept :
-            x_test=__fit_intercept(x_test)
+            x_test=fit_intercept(x_test)
 
         t_square=np.square(self.t)
         predictions=[] # empty prediction list
@@ -110,12 +94,12 @@ class LogisticRegression:
             raise ValueError('x_train shape does not match y_train'
                              f'{x_train.shape[0]} and {y_train.shape[0]}')
         #making sure inputs are in array type
-        x_train,y_train=__change_type(x_train,y_train)
+        x_train,y_train=change_type(x_train,y_train)
         #adding intercept term if specified by user
         if self.fit_intercept:
-            x_train=__fit_intercept(x_train)
+            x_train=fit_intercept(x_train)
         #initializing parameters
-        self.parameters=__init_parameters(x_train)
+        self.parameters=init_parameters(x_train)
         likelihood_old='inf'
         #training the model
         while(True):
@@ -162,13 +146,13 @@ class PoissonRegression:
 
     # Defining the fit method
     def fit(self,x_train,y_train):
-        x_train,y_train=__change_type(x_train,y_train)
+        x_train,y_train=change_type(x_train,y_train)
         if (x_train.shape[0]!=y_train.shape[0]):
             raise ValueError('x_train shape does not match y_train'
                              f'{x_train.shape[0]} and {y_train.shape[0]}')
         if self.fit_intercept:
-            x_train=__fit_intercept(x_train)
-        self.parameters=__init_parameters(x_train) # initializing parameters to vector of zeros
+            x_train=fit_intercept(x_train)
+        self.parameters=init_parameters(x_train) # initializing parameters to vector of zeros
 
         # defining the likelihood ascent :
         self.exit_point=np.power(10.0,-5) #defining exit_point for the loop
@@ -185,7 +169,7 @@ class PoissonRegression:
             raise ValueError('Fit method was not called '
                              'Training data was not provided !')
         
-        x_test=__change_type(x_test)
+        x_test=change_type(x_test)
         if self.fit_intercept:
-            x_test=__fit_intercept(x_test)
+            x_test=fit_intercept(x_test)
         return np.dot(x_test,self.parameters)
