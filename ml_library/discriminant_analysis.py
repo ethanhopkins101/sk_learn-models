@@ -16,7 +16,8 @@ class QuadraticDiscriminantAnalysis:
         count_positive=sum(y_train) #Nb of positive examples
         count_negative=y_train.shape[0]-count_positive
         self.theta=count_positive/y_train.shape[0]
-        self.mu0=np.sum(x_train[np.where(y_train==0)])/count_negative
-        self.mu1=np.sum(x_train[np.where(y_train==1)])/count_positive
+        self.mu0=np.sum(x_train[np.where(y_train==0)],axis=0)/count_negative
+        self.mu1=np.sum(x_train[np.where(y_train==1)],axis=0)/count_positive
+        self.sigma=(np.dot((x_train[np.where(y_train==0)-self.mu0]).T,x_train[np.where(y_train==0)]-self.mu0),
+                           +np.dot((x_train[np.where(y_train==1)]-self.mu1).T,(x_train[np.where(y_train==1)]-self.mu1)))/x_train.shape[0]
         
-        pass
