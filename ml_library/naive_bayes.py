@@ -30,12 +30,20 @@ class MultivariateBernoulliNB:
     # Defining the fit method
     def fit(self, x_train: ) -> None:
         ...
+    
     # Defining the predict method
-
     def predict(self, x_test ) ->None:
         ...
 
 class MultinomialNB:
 
     def __init__(self, ) -> None:
+        ...
+
+    # Defining the fit method
+    def fit(self, x_train: ) -> None:
+        ...
+    
+    # Defining the predict method
+    def predict(self, x_test ) ->None:
         ...
