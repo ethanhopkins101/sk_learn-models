@@ -44,7 +44,7 @@ class CountVectorizer:
 
         content_words= set(content_words) # removes all duplicates 
         # filling the dictionary with obtained words , with values representing current index
-        self.dictionary= {k:v for v,k in enumerate(content_words)}
+        self.dictionary= {v:k for k,v in enumerate(content_words)}
     
     # Defining the Transform method
     def transform(self, x_transform: MatrixLike | ArrayLike) -> np.ndarray:
@@ -79,3 +79,24 @@ class CountVectorizer:
     # Defining the get_feature_names_out method
     def get_feature_names_out(self) -> List[str]:
         return self.dictionary.keys()
+    
+class IndexVectorizer:
+    
+    def __init__(self) -> None:
+        self.dictionary=None
+
+    def fit(self, x_train: MatrixLike | ArrayLike) -> None:
+
+        if x_train.shape[1]> 1:
+            raise ValueError ('Invalid input shape')
+        
+        x_train=change_type(x_train)
+        temp= [] # temporary dictionary
+        for i in range(len(x_train)):
+            temp.extend(x_train[i])
+        
+        combined= ' '.join(temp) # one big email
+        combined= combined.split(' ') # split to words
+        combined= set(combined)
+
+        self.dictionary= {v:k for k,v in enumerate(combined)}
