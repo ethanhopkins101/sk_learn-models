@@ -93,10 +93,26 @@ class IndexVectorizer:
         x_train=change_type(x_train)
         temp= [] # temporary dictionary
         for i in range(len(x_train)):
-            temp.extend(x_train[i])
+            temp.append(x_train[i])
         
         combined= ' '.join(temp) # one big email
         combined= combined.split(' ') # split to words
         combined= set(combined)
 
-        self.dictionary= {v:k for k,v in enumerate(combined)}
+        self.dictionary= {v:k for k,v in enumerate(combined,start=1)}
+        self.dictionary['ood']=0 #giving any unobserved word index 0 (ood=out-of-dictionary)
+
+    def transform(self, x_transform: MatrixLike | ArrayLike) -> np.ndarrray:
+
+        x_transform= change_type(x_transform)
+        holder_matrix= np.zeros((len(x_transform),len(self.dictionary)))
+
+        for i in range(len(x_transform)):
+            temp= x_transform[i].split(' ') #temp holds list of words
+            
+            for j in range(temp):
+                if temp[j] in self.dictionary.keys():
+                    #replace words with corresponding index in self.dictionary
+                    holder_matrix[i,j]= self.dictionary[temp[j]]
+                    
+        return holder_matrix
