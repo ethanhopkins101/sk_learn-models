@@ -1,7 +1,7 @@
 import numpy as np
 from matrix_operations import *
 from numpy.typing import ArrayLike
-from typing import List
+from typing import List,Set
 """
 text.py
 
@@ -52,10 +52,10 @@ class CountVectorizer:
         if x_transform.shape[1] > 1: 
             raise ValueError ('The given inputs do not satisfy the required conditions')
             
-        x_transform= change_type(x_transform) # changing x_transform type to ndarray incase
+        x_transform: np.ndarray= change_type(x_transform) # changing x_transform type to ndarray incase
         
         # Supposed transformation of (x_transform)
-        holder_matrix= np.zeros((x_transform.shape[0],len(self.dictionary)))
+        holder_matrix: MatrixLike= np.zeros((x_transform.shape[0],len(self.dictionary)))
 
         for i in range(x_transform.shape[0]):
             words= x_transform[i].split(' ')
@@ -91,24 +91,24 @@ class IndexVectorizer:
             raise ValueError ('Invalid input shape')
         
         x_train=change_type(x_train)
-        temp= [] # temporary dictionary
+        temp: List[str]= [] # temporary dictionary
         for i in range(len(x_train)):
             temp.append(x_train[i])
         
-        combined= ' '.join(temp) # one big email
-        combined= combined.split(' ') # split to words
-        combined= set(combined)
+        combined: List[str]= ' '.join(temp) # one big email
+        combined: List[str]= combined.split(' ') # split to words
+        combined: Set[str]= set(combined)
 
         self.dictionary= {v:k for k,v in enumerate(combined,start=1)}
         self.dictionary['ood']=0 #giving any unobserved word index 0 (ood=out-of-dictionary)
 
     def transform(self, x_transform: MatrixLike | ArrayLike) -> np.ndarrray:
 
-        x_transform= change_type(x_transform)
-        holder_matrix= np.zeros((len(x_transform),len(self.dictionary)))
+        x_transform: np.ndarray= change_type(x_transform)
+        holder_matrix: MatrixLike= np.zeros((len(x_transform),len(self.dictionary)))
 
         for i in range(len(x_transform)):
-            temp= x_transform[i].split(' ') #temp holds list of words
+            temp: List[str]= x_transform[i].split(' ') #temp holds list of words
             
             for j in range(temp):
                 if temp[j] in self.dictionary.keys():
