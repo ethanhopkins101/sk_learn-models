@@ -1,4 +1,6 @@
 import numpy as np
+from matrix_operations import *
+from numpy.typing import ArrayLike
 """
 Module Name: model_selection.py
 
@@ -29,5 +31,14 @@ Functions
 
 """
 
-def tain_test_split():
-    pass
+def train_test_split(inputs: MatrixLike | ArrayLike,
+                     target: MatrixLike | ArrayLike,
+                     test_size: float,
+                     random_state: int | None = None,
+                     stratify: MatrixLike | ArrayLike | None = None,
+                     ) -> tuple[np.ndarray]:
+    
+    validate_inputs(inputs,target)
+    holder_matrix: MatrixLike | ArrayLike= np.hstack((inputs,target), axis= 1)
+    # shuffling the input data
+    np.random.default_rng(seed= random_state).shuffle(holder_matrix, axis= 1)
