@@ -1,73 +1,97 @@
 import numpy as np
 from matrix_operations import *
+from typing import Optional
+from numpy.typing import ArrayLike
 #Linear_Regression
 class LinearRegression:
-    #Class initializer
+    """
+    Least Mean Square LinearRegression
+    """
     def __init__(self,fit_intercept=False):
-        self.fit_intercept=fit_intercept
-        self.parameters=None #initializing parameters
+        self.fit_intercept: bool= fit_intercept
+        self.parameters: Optional[MatrixLike | ArrayLike]= None
 
-    #defining the fit method
-    def fit(self,x_train,y_train):
-        x_train,y_train=change_type(x_train,y_train) #changing the inputs type to arrays
+    def fit(self,x_train: MatrixLike | ArrayLike,
+            y_train: MatrixLike | ArrayLike) -> None:
+        """
+        Parameters
+         ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            Training data.
+    
+        y : array-like of shape (n_samples,) or (n_samples, n_targets)
+            Target values. Will be cast to X's dtype if necessary.
+    
+        sample_weight : array-like of shape (n_samples,), default=None
+            Individual weights for each sample.
+     
+        Returns
+        -------
+        self : object
+            Fitted Estimator.
+        """
+        x_train,y_train= change_type(x_train,y_train)
         #adding intercept term if specified by user
         if self.fit_intercept:
-            x_train=fit_intercept(x_train)
+            x_train= fit_intercept(x_train)
         #Designing the learning algorithm (normal equations: o=(x.T*x).inv*x.T*y)
-        self.parameters=np.dot(np.linalg.inv(np.dot(x_train.T,x_train)),np.dot(x_train.T,y_train))
+        self.parameters: MatirxLike | ArrayLike= np.dot(np.linalg.inv(np.dot(x_train.T,x_train)),np.dot(x_train.T,y_train))
     
-    #defining the predict method
-    def predict(self,x_test):
+    def predict(self, x_test: MatrixLike | ArrayLike) -> np.ndarray:
+
         if self.parameters is None :
             raise ValueError('Fit method was not called'
                              'Training data was not provided !')
 
-        x_test=change_type(x_test) #making sure x_test is of array type 
+        x_test= change_type(x_test)
         if self.fit_intercept:
-            x_test=fit_intercept(x_test) # adding intercept term to x_test
-        return np.dot(x_test,self.parameters) # return m by 1 column vector of predictions
+            x_test= fit_intercept(x_test)
+        return np.dot(x_test, self.parameters) # (mx1) column vector
+    
     @property
-    def coef_(self):
+    def coef_(self) -> np.ndarray:
         return self.parameters[1:] # returns the 'coef' except for the intercept
+    
     @property
-    def intercept_(self):
+    def intercept_(self) -> float:
         return self.parameters[0] # returns the 'intercept'
 
 
-#Locally_Weighted_Regression
-class LocallyWeightedRegression:
-    #class initializer
-    def __init__(self,t,fit_intercept=False):
-        self.t=t
-        self.fit_intercept=fit_intercept
-        self.x_train=None
-        self.y_train=None
-    #defining the fit method
-    def fit(self,x_train,y_train,x_test):
-        if (x_train.shape[0]!=y_train.shape[0]):
-            raise ValueError('x_train shape does not match y_train'
-                             f'{x_train.shape[0]} and {y_train.shape[0]}')
-        #making sure the inputs are of array type
-        x_train,y_train=change_type(x_train,y_train)
 
+class LocallyWeightedRegression:
+
+    def __init__(self,tunning_parameter,fit_intercept=False):
+        self.tuning_parameter: float= tunning_parameter
+        self.fit_intercept: bool= fit_intercept
+        self.x_train: Optional[MatrixLike]= None
+        self.y_train: Optional[MatrixLike]= None
+
+    def fit(self, x_train: MatrixLike | ArrayLike,
+            y_train: MatrixLike | ArrayLike) -> None:
+        
+        validate_inputs(x_train, y_train)
+
+        x_train,y_train=change_type(x_train,y_train)
         #adding intercept term if specified by user
         if self.fit_intercept:
             x_train=fit_intercept(x_train)
-        self.x_train,self.y_train=x_train,y_train
-         #defining the predict method
 
-    def predict(self,x_test):
+        self.x_train, self.y_train= x_train, y_train
+
+    def predict(self, x_test: MatrixLike | ArrayLike) -> np.ndarray:
+
         #Checking if user provided training-sets already
         if self.x_train is None:
             raise ValueError('Fit method was not called'
                 'Training data was not provided !')
-        x_test=change_type(x_test)
+        
+        x_test= change_type(x_test)
         #Adding intercept term if specified by the user
         if self.fit_intercept :
             x_test=fit_intercept(x_test)
 
-        t_square=np.square(self.t)
-        predictions=[] # empty prediction list
+        t_square=np.square(self.tuning_parameter)
+        predictions: List[float]= [] # empty prediction list
 
         #designing the algorithm using normal equations
         for i in range(x_test.shape[0]): #Looping through the prediction points 
@@ -79,17 +103,19 @@ class LocallyWeightedRegression:
             weights=np.multiply(weights,np.identity(len(weights))) # Weight matrix (mxm)
             parameters=np.dot(np.linalg.inv(np.dot(self.x_train.T,np.dot(weights,self.x_train))),np.dot(self.x_train.T,np.dot(weights,self.y_train)))
             predictions.append(np.dot(x_test[i,:],parameters))
+
         return np.array(predictions)
 
-
 class LogisticRegression:
-    #class initializer
-    def __init__(self,fit_intercept=False):
-        self.fit_intercept=fit_intercept
-        self.parameters=None
-        self.learn_rate=0.05
-    # defining the fit method
-    def fit(self,x_train,y_train):
+
+    def __init__(self, fit_intercept: bool= False, learn_rate: Optional[float]= 0.05) -> None:
+        self.fit_intercept: bool= fit_intercept
+        self.parameters: Optional[MatrixLike | ArrayLike]= None
+        self.learn_rate: float= learn_rate
+
+    def fit(self, x_train: MatrixLike | ArrayLike,
+            y_train: MatrixLike | ArrayLike) -> None:
+        
         if (x_train.shape[0]!=y_train.shape[0]):
             raise ValueError('x_train shape does not match y_train'
                              f'{x_train.shape[0]} and {y_train.shape[0]}')
