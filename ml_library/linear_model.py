@@ -108,44 +108,56 @@ class LocallyWeightedRegression:
 
 class LogisticRegression:
 
-    def __init__(self, fit_intercept: bool= False, learn_rate: Optional[float]= 0.05) -> None:
+    def __init__(self, max_iteration: Optional[int]= 1000,
+                 fit_intercept: bool= False,
+                 learn_rate: Optional[float]= 0.05) -> None:
+        
         self.fit_intercept: bool= fit_intercept
         self.parameters: Optional[MatrixLike | ArrayLike]= None
         self.learn_rate: float= learn_rate
+        self.max_iteration: int= max_iteration
 
     def fit(self, x_train: MatrixLike | ArrayLike,
             y_train: MatrixLike | ArrayLike) -> None:
         
-        if (x_train.shape[0]!=y_train.shape[0]):
-            raise ValueError('x_train shape does not match y_train'
-                             f'{x_train.shape[0]} and {y_train.shape[0]}')
-        #making sure inputs are in array type
+        validate_inputs(x_train, y_train)
         x_train,y_train=change_type(x_train,y_train)
         #adding intercept term if specified by user
         if self.fit_intercept:
             x_train=fit_intercept(x_train)
-        #initializing parameters
-        self.parameters=init_parameters(x_train)
-        likelihood_old='inf'
-        #training the model
+
+        self.parameters=init_parameters(x_train) # params = vector of zeros
+        iteration: int= 0
+        #train
         while(True):
-            hypothesis=1/(1+np.exp(-np.dot(x_train,self.parameters)))
-            likelihood=np.dot(x_train.T,(y_train-hypothesis))
+            hypothesis: MatrixLike= 1/(1+np.exp(-np.dot(x_train,self.parameters)))
+            gradient: MatrixLike= np.dot(x_train.T,(y_train-hypothesis))
             #gradient ascent
-            self.parameters=self.parameters+self.learn_rate*likelihood
+            self.parameters: MatrixLike= self.parameters + self.learn_rate * gradient
             #checking for convergence to end the loop
-            if likelihood_old>likelihood:
+            if np.linalg.norm(gradient) < 1e-7:
                 break
-            likelihood_old=likelihood
-    #defining predict method
-    def predict(self):
-        pass
+
+            iteration+= 1
+            if iteration > self.max_iteration:
+                print('Reached max iteration {} without convergence'.format(self.max_iteration))
+                break
+
+    def predict(self, x_test: MatrixLike | ArrayLike) -> np.ndarray:
+
+        if self.parameters is None:
+            raise ValueError('Fit method was not called, train-data was not provided')
+        x_test= np.array(x_test)
+        if self.fit_intercept:
+            x_test= fit_intercept(x_test)
+        return np.array(np.dot(x_test, self.parameters)) #(mx1) prediction vector
 
     @property
-    def coef_(self):
+    def coef_(self) -> np.ndarray:
         return self.parameters[1:]
+    
     @property
-    def intercept_(self):
+    def intercept_(self) -> float:
         return self.parameters[0]
     
 class PoissonRegression:
