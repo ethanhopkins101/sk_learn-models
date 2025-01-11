@@ -36,7 +36,7 @@ class PolynomialFeatures:
 
 
 class StandardScaler:
-    def __init__(self):
+    def __init__(self) -> None:
         self.mean: Optional[np.ndarray]= None
         self.std: Optional[np.ndarray]= None
 
@@ -47,6 +47,22 @@ class StandardScaler:
 
     def transform(self, x_transform: MatrixLike | ArrayLike) -> np.ndarray:
 
+        if (self.mean | self.std) is None:
+            raise TypeError('Fit method was not called, parameters are not initialized ')
         return (x_transform - self.mean) / self.std
 
+    def fit_transform(self, x_train: MatrixLike | ArrayLike,
+                      x_transform: MatrixLike | ArrayLike) -> np.ndarray:
+        self.mean= x_train.mean(axis= 0)
+        self.std= x_train.std(axis= 0)
+
+        return (x_transform - self.mean) / self.std
+    
 class MinMaxScaler:
+
+    def __init__(self) -> None:
+        self.min: Optional[np.ndarray]= None
+        self.max: Optional[np.ndarray]= None
+
+    def fit(self, x_train: MatrixLike | ArrayLike):
+        
