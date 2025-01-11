@@ -1,6 +1,7 @@
 import numpy as np
 from matrix_operations import *
 from numpy.typing import ArrayLike
+from typing import Optional
 """
 Module Name: preprociessing.py
 
@@ -34,11 +35,18 @@ class PolynomialFeatures:
         pass
 
 
-class StandardScalar:
+class StandardScaler:
     def __init__(self):
-        pass
+        self.mean: Optional[np.ndarray]= None
+        self.std: Optional[np.ndarray]= None
 
-    def fit(self):
-        pass
-    def transform(self):
-        pass
+    def fit(self, x_train: MatrixLike | ArrayLike) -> None:
+        
+        self.mean= x_train.mean(axis= 0)
+        self.std= x_train.std(axis= 0)
+
+    def transform(self, x_transform: MatrixLike | ArrayLike) -> np.ndarray:
+
+        return (x_transform - self.mean) / self.std
+
+class MinMaxScaler:
