@@ -30,3 +30,17 @@ def train_test_split(inputs: ArrayLike, target: ArrayLike
             break
     size: int= int(test_size * len(inputs))
     return inputs[:size,:], inputs[size:,:], target[:size], target[size:]
+
+class GridSearchCV:
+
+    def __init__(self, estimator, param_grid, scoring, cv= 5) -> None:
+        self.estimator= estimator
+        self.param_grid= param_grid
+        self.scoring= scoring
+        self.cv: int= cv
+
+
+    def fit(self, x: ArrayLike, y: ArrayLike) -> None:
+        eval= []
+        for i in range(self.cv):
+            x
