@@ -28,5 +28,5 @@ def train_test_split(inputs: ArrayLike, target: ArrayLike
             target[-indexes[i]]= tempy
         except:
             break
-    size= int(test_size * len(inputs))
+    size: int= int(test_size * len(inputs))
     return inputs[:size,:], inputs[size:,:], target[:size], target[size:]
